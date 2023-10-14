@@ -3,9 +3,12 @@ import java.util.LinkedList;
 public class TabelaDispersao {
     private LinkedList<Veiculo>[] tabela;
     private int tamanho;
+    private int tamanhoOriginal;
+    private static final double FATOR_CARGA_MAXIMO = 0.75; // Limite para redimensionar a tabela
 
     public TabelaDispersao(int tamanho) {
         this.tamanho = tamanho;
+        this.tamanhoOriginal = tamanho;
         tabela = new LinkedList[tamanho];
         for (int i = 0; i < tamanho; i++) {
             tabela[i] = new LinkedList<>();
@@ -13,10 +16,11 @@ public class TabelaDispersao {
     }
 
     public void inserir(Veiculo veiculo) {
-        int indice = calcularIndice(veiculo.getPlacaDescomprimida(
-            HuffmanCompressor.getHuffmanRoot()
-        )); // Use a placa descomprimida para calcular o índice.
+        int indice = calcularIndice(veiculo.placa);
         tabela[indice].add(veiculo);
+        if (calcularFatorCarga() > FATOR_CARGA_MAXIMO) {
+            redimensionarTabela();
+        }
     }
 
     private int calcularIndice(String placa) {
@@ -26,9 +30,7 @@ public class TabelaDispersao {
     public Veiculo buscarPorPlaca(String placa) {
         int indice = calcularIndice(placa);
         for (Veiculo veiculo : tabela[indice]) {
-            if (veiculo.getPlacaDescomprimida(
-                HuffmanCompressor.getHuffmanRoot()
-            ).equals(placa)) { // Use a placa descomprimida para fazer a comparação.
+            if (veiculo.placa.equals(placa)) {
                 return veiculo;
             }
         }
@@ -40,7 +42,7 @@ public class TabelaDispersao {
         int indice = calcularIndice(placa);
         LinkedList<Veiculo> lista = tabela[indice];
         for (Veiculo veiculo : lista) {
-            if (veiculo.getPlacaDescomprimida(HuffmanCompressor.getHuffmanRoot()).equals(placa)) { // Use a placa descomprimida para fazer a comparação.
+            if (veiculo.placa.equals(placa)) {
                 lista.remove(veiculo);
                 return true;
             }
@@ -70,5 +72,31 @@ public class TabelaDispersao {
 
     public int quantidadeCompartimentos() {
         return tabela.length;
+    }
+
+    private double calcularFatorCarga() {
+        return (double) tamanho() / (double) tamanho;
+    }
+
+    private void redimensionarTabela() {
+        int novoTamanho = tamanho * 2;
+        LinkedList<Veiculo>[] novaTabela = new LinkedList[novoTamanho];
+
+        for (LinkedList<Veiculo> compartimento : tabela) {
+            for (Veiculo veiculo : compartimento) {
+                int novoIndice = calcularIndice(veiculo.placa, novoTamanho);
+                if (novaTabela[novoIndice] == null) {
+                    novaTabela[novoIndice] = new LinkedList<>();
+                }
+                novaTabela[novoIndice].add(veiculo);
+            }
+        }
+
+        tabela = novaTabela;
+        tamanho = novoTamanho;
+    }
+
+    private int calcularIndice(String placa, int tamanho) {
+        return placa.hashCode() % tamanho;
     }
 }

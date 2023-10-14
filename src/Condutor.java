@@ -1,23 +1,23 @@
 public class Condutor {
-    public byte[] nome;
-    public byte[] cpf;
+    public String nome;
+    public String cpf;
 
-    public Condutor(byte[] nome, byte[] cpf) {
+    public Condutor(String nome, String cpf) {
         this.nome = nome;
         this.cpf = cpf;
     }
     public Condutor() {
     }
-    public byte[] getCpf() {
+    public String getCpf() {
         return cpf;
     }
-    public byte[] getNome() {
+    public String getNome() {
         return nome;
     }
-    public void setCpf(byte[] cpf) {
+    public void setCpf(String cpf) {
         this.cpf = cpf;
     }
-    public void setNome(byte[] nome) {
+    public void setNome(String nome) {
         this.nome = nome;
     }
 }

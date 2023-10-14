@@ -5,12 +5,20 @@ import java.util.List;
 public class TabelaDispersaoComEnderecamentoAberto {
     private Veiculo[] tabela;
     private int tamanho;
-    private HuffmanNode huffmanRoot; // Adicione este campo para a árvore de Huffman
 
-    public TabelaDispersaoComEnderecamentoAberto(int tamanho, HuffmanNode huffmanRoot) {
+    public TabelaDispersaoComEnderecamentoAberto(int tamanho) {
         this.tamanho = tamanho;
         tabela = new Veiculo[tamanho];
-        this.huffmanRoot = huffmanRoot;
+    }
+
+    public void inserir(Veiculo veiculo) {
+        int indice = calcularIndice(veiculo.placa);
+
+        while (tabela[indice] != null) {
+            indice = (indice + 1) % tamanho;
+        }
+
+        tabela[indice] = veiculo;
     }
 
     public Veiculo buscarPorPlaca(String placa) {
@@ -41,6 +49,16 @@ public class TabelaDispersaoComEnderecamentoAberto {
         return false;
     }
 
+    public List<Veiculo> listarTodos() {
+        List<Veiculo> todosVeiculos = new ArrayList<>();
+        for (Veiculo veiculo : tabela) {
+            if (veiculo != null) {
+                todosVeiculos.add(veiculo);
+            }
+        }
+        return todosVeiculos;
+    }
+
     public int tamanho() {
         int tamanhoTotal = 0;
         for (Veiculo veiculo : tabela) {
@@ -60,28 +78,13 @@ public class TabelaDispersaoComEnderecamentoAberto {
     }
 
     private int calcularIndice(String placa) {
-        String placaOriginal = HuffmanCompressor.decompress(placa, huffmanRoot);
-        
-        int hashCode = placaOriginal.hashCode();
+        int hashCode = placa.hashCode();
         int indice = hashCode % tamanho;
-    
-        if (indice < 0) {
-            indice += tamanho;
-        }
-    
-        return indice;
-    }
 
-    private int calcularIndice(byte[] placa) {
-        String placaOriginal = HuffmanCompressor.decompress(placa, huffmanRoot);
-        
-        int hashCode = placaOriginal.hashCode();
-        int indice = hashCode % tamanho;
-    
         if (indice < 0) {
             indice += tamanho;
         }
-    
+
         return indice;
     }
 
@@ -121,30 +124,4 @@ public class TabelaDispersaoComEnderecamentoAberto {
 
         return tabelaListas;
     }
-
-    public void setHuffmanRoot(HuffmanNode huffmanRoot) {
-        this.huffmanRoot = huffmanRoot;
-    }
-
-    public void inserir(Veiculo veiculo) {
-        int indice = calcularIndice(veiculo.placa);
-
-        while (tabela[indice] != null) {
-            indice = (indice + 1) % tamanho;
-        }
-
-        tabela[indice] = veiculo;
-    }
-
-    public List<Veiculo> listarTodos() {
-        List<Veiculo> todosVeiculos = new ArrayList<>();
-        for (Veiculo veiculo : tabela) {
-            if (veiculo != null) {
-                veiculo.setPlaca(HuffmanCompressor.decompress(veiculo.placa, huffmanRoot));
-                todosVeiculos.add(veiculo);
-            }
-        }
-        return todosVeiculos;
-    }
-
 }
